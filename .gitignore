@@ -1,0 +1,12 @@
+/Makefile.win
+*.o
+/SDLCrystalSerpentEngine.bookmarks
+/SDLCrystalSerpentEngine.debug
+/SDLCrystalSerpentEngine.dev
+/SDLCrystalSerpentEngine.exe
+/app.ico
+/SDLCrystalSerpentEngine.layout
+/SDLCrystalSerpentEngine_private.h
+/SDLCrystalSerpentEngine_private.rc
+/SDLCrystalSerpentEngine_private.res
+/main.s

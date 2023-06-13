@@ -5,6 +5,12 @@
 #include "./common.h"
 
 namespace SDLCSE {
+	struct ColorKey {
+		int r;
+		int g;
+		int b;
+	};
+	
 	class cTexture {
 	public:
 		SDL_Surface* surface;
@@ -16,6 +22,16 @@ namespace SDLCSE {
 			renderer = r;
 			
 			load(path);
+		}
+		
+		cTexture(std::string path, SDL_Renderer* r, ColorKey colorKey){
+			texture = NULL; //The final texture
+			surface = NULL;
+			renderer = r;
+			
+			surface = IMG_Load(path.c_str()); //Load image at specified path
+			SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, colorKey.r, colorKey.g, colorKey.b));
+			texture = SDL_CreateTextureFromSurface(r, surface);
 		}
 		
 		cTexture(SDL_Renderer* renderer, int w, int h, uint32_t flags=0, int depth=32,
@@ -70,24 +86,28 @@ namespace SDLCSE {
 			if (surface != NULL){
 				return surface->w;
 			}
+			return 0;
 		}
 		
 		int getHeight(){
 			if (surface != NULL){
 				return surface->h;
 			}
+			return 0;
 		}
 		
 		uint32_t* getPixels32(){ // shamelessly took from Lazy Foo's tutorials 
 			if (surface != NULL){ 
 				return static_cast<uint32_t*>(surface->pixels);
 			}
+			return 0;
 		}
 		
 		int getPitch32(){ // shamelessly took from Lazy Foo's tutorials
 			if (surface != NULL){ 
 				return surface->pitch/4;
 			}
+			return 0;
 		}
 		
 		void freeTexture(){

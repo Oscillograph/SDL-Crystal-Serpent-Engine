@@ -159,11 +159,13 @@ namespace SDLCSE {
 				// As we draw a line, we need to construct its equation
 				// to determine coordinates between start and end points.
 				// 					y = kx + c
-				int k = y1/x1; 
-				int c = y1 - k*x1; 
+				//int k = y1/x1; 
+				//int c = y1 - k*x1; 
  
+				SDL_FPoint dxy = Math::findNorm({(float)(x2 - x1), (float)(y2 - y1)});
 				for (xn = x1; xn < x2; xn++){
-					yn = k*xn + c;
+					yn = y1 + (int)(dxy.y*(xn-x1));
+					//yn = k*xn + c;
 					DrawPixel(layer, xn, yn, color, alpha);
 				}
 				
@@ -182,11 +184,14 @@ namespace SDLCSE {
 				// As we draw a line, we need to construct its equation
 				// to determine coordinates between start and end points.
 				// 					y = kx + c
-				int k = y1/x1; 
-				int c = y1 - k*x1; 
+				//int k = (int)(y1/x1); 
+				//int c = (int)(y1 - k*x1); 
+				
+				SDL_FPoint dxy = Math::findNorm({(float)(x2 - x1), (float)(y2 - y1)});
 				
 				for (xn = x1; xn < x2; xn++){
-					yn = k*xn + c;
+					yn = y1 + (int)(dxy.y*(xn-x1));
+					//yn = k*xn + c;
 					DrawPixel(surface, xn, yn, color, alpha);
 				}
 				

@@ -497,14 +497,20 @@ namespace SDLCSE {
 			// this way we get an equivalent of a set of raster surfaces
 		}
 		
-		void RenderText(SDL_Rect* place,		// where to draw  
+		void RenderText(SDL_FRect* place,		// where to draw  
 					  int pxSize, 			// size of the pen
 					  Colors::RGBA color, 	// color
 					  std::u32string text, 	// what to draw
 					  int interval = 2){	// interval between lines
+			// convert from float Rect to int
+			tempRect.x = round(place->x);
+			tempRect.y = round(place->y);
+			tempRect.w = round(place->w);
+			tempRect.h = round(place->h);
+			
 			// cols and rows with no respect to spaces trimming made via correctX variable
-			int cols = place->w / (8*pxSize);
-			int rows = place->h / ((8 + interval)*pxSize);
+			int cols = tempRect.w / (8*pxSize);
+			int rows = tempRect.h / ((8 + interval)*pxSize);
 			int currentRow = 0;
 			long long unsigned int symbolId = 0; // the type corresponds to std::u32string::npos
 			int correctX = 0;
@@ -564,9 +570,9 @@ namespace SDLCSE {
 								// correctX--;
 							}
 							// position the cursor
-							curX = place->x + j*8*pxSize + correctX*pxSize;
+							curX = tempRect.x + j*8*pxSize + correctX*pxSize;
 							// curX = place->x + j*8*pxSize;
-							curY = place->y + correctY;
+							curY = tempRect.y + correctY;
 							
 							// draw the symbol in its place
 							for(l = 0; l < 8; l++){
@@ -593,15 +599,21 @@ namespace SDLCSE {
 			fontTarget->update();
 		}
 		
-		cTexture* RenderTextToTexture(SDL_Rect* place,		// where to draw  
+		cTexture* RenderTextToTexture(SDL_FRect* place,		// where to draw  
 			int pxSize, 			// size of the pen
 			Colors::RGBA color, 	// color
 			std::u32string text, 	// what to draw
 			int interval = 2){	// interval between lines
 			
+			// convert from float Rect to int
+			tempRect.x = round(place->x);
+			tempRect.y = round(place->y);
+			tempRect.w = round(place->w);
+			tempRect.h = round(place->h);
+			
 			// cols and rows with no respect to spaces trimming made via correctX variable
-			int cols = place->w / (8*pxSize);
-			int rows = place->h / ((8 + interval)*pxSize);
+			int cols = tempRect.w / (8*pxSize);
+			int rows = tempRect.h / ((8 + interval)*pxSize);
 			int currentRow = 0;
 			long long unsigned int symbolId = 0; // the type corresponds to std::u32string::npos
 			int correctX = 0;
@@ -610,7 +622,7 @@ namespace SDLCSE {
 			int curY;
 			int alphabetId = 0;
 			bool foundSymbol = false;
-			cTexture* textTexture = new cTexture(renderer, place->w, place->h, 0, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+			cTexture* textTexture = new cTexture(renderer, tempRect.w, tempRect.h, 0, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
 			SDL_SetTextureBlendMode(textTexture->texture, SDL_BLENDMODE_BLEND);
 			uint32_t fontColor = SDL_MapRGBA(textTexture->surface->format,
 				color.r, color.g, color.b, color.a);
@@ -705,8 +717,38 @@ namespace SDLCSE {
 			SDL_UpperBlitScaled(surface, NULL, screenSurface, stretchRect);
 		}
 		
-		void placeTexture(SDL_Texture* texture, SDL_Rect* stretchRect){
-			SDL_RenderCopy(renderer, texture, NULL, stretchRect);
+		void placeSurface(SDL_Surface* surface, SDL_FRect* stretchRect){
+			tempRect.x = round(stretchRect->x);
+			tempRect.y = round(stretchRect->y);
+			tempRect.w = round(stretchRect->w);
+			tempRect.h = round(stretchRect->h);
+			SDL_UpperBlitScaled(surface, NULL, screenSurface, &tempRect);
+		}
+		
+		void placeTexture(SDL_Texture* texture, SDL_Rect* stretchRect, SDL_Rect* srcRect=NULL){
+			SDL_RenderCopy(renderer, texture, srcRect, stretchRect);
+		}
+		
+		void placeTextureF(SDL_Texture* texture, SDL_FRect* stretchRect, SDL_Rect* srcRect=NULL){
+			SDL_Rect place = { 
+				(int)round(stretchRect->x),
+				(int)round(stretchRect->y),
+				(int)round(stretchRect->w),
+				(int)round(stretchRect->h)
+			};
+			
+			SDL_Rect source = place;
+			
+			if (srcRect != NULL){
+				source = { 
+					srcRect->x,
+					srcRect->y,
+					srcRect->w,
+					srcRect->h
+				};
+			}
+			
+			SDL_RenderCopy(renderer, texture, &source, &place);
 		}
 		
 		void demoDrawPixels(){
